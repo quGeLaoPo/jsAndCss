@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <style>
+        .leaf {
+            background: url('leaf.jpg') no-repeat;
+            backgroud-size: 100% 100%;
+            height: 20.5rem;
+        }
+
+        .leaf1 {
+            background: url('leaf.jpg') no-repeat;
+            backgroud-size: 100% 100%;
+            height: 20.5rem;
+        }
+
+    </style>
+</head>
+<body>
+<script src="js/jquery-3.1.1.min.js"></script>
+<div id="leaf1" class="leaf"></div>
+<div class="leaf1" style="display: none"></div>
+<div>当前事件是：</div>
+<h1 id="show"></h1>
+
+
+<script>
+    function getSystemId() {
+        var systemId = "Android";
+        var u = navigator.userAgent;
+        if (u.indexOf('Android') > -1 || u.indexOf('Linux') > -1) {//安卓手机
+            systemId = "Android";
+        } else if (u.indexOf('iPhone') > -1) {//苹果手机
+            systemId = "IOS";
+        } else if (u.indexOf('Windows Phone') > -1) {//winphone手机
+            systemId = "Winphone";
+        }
+        return systemId;
+    }
+    var timeOutEvent = 0;
+    /*ios长按*/
+    var systemId = getSystemId();
+    if (systemId == "IOS") {
+        $.fn.longPress = function () {
+            $(this).on({
+                touchstart: function (e) {
+                    timeOutEvent = setTimeout("showLongPress();", 500);
+                    e.preventDefault();
+                },
+                touchmove: function (e) {
+                    clearTimeout(timeOutEvent);
+                    timeOutEvent = 0;
+                },
+                touchend: function (e) {
+                    clearTimeout(timeOutEvent);
+                    if (timeOutEvent != 0) {
+                        $("#show").html("点击事件");
+                    }
+                }
+            })
+        }
+    } else if (systemId = "Android") {
+        $.fn.longPress = function () {
+            $(this).on({
+                touchstart: function (e) {
+                    timeOutEvent = setTimeout(function () {
+                        $(this).bind('contextmenu', function (e) {
+                            showLongPress();
+                            //阻止长按默认行为
+                            e.preventDefault();
+                        })
+                    }, 200);
+                },
+                touchmove: function (e) {
+                    clearTimeout(timeOutEvent);
+                    timeOutEvent = 0;
+                },
+                touchend: function () {
+                    clearTimeout(timeOutEvent);
+                    if (timeOutEvent != 0) {
+                        showClick();
+                    }
+                    return false;
+                }
+            })
+        }
+
+    };
+
+    $("#leaf1").longPress();
+    function showLongPress() {
+        timeOutEvent = 0;
+        $("#show").html("长按事件");
+    }
+
+    function showClick() {
+        $("#show").html("点击事件");
+    }
+
+</script>
+
+
+</div>
+
+
+</body>
+</html>
